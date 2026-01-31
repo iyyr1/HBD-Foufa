@@ -12,6 +12,7 @@
             overflow-x: hidden;
             background-color: #fce4ec;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #countdown-screen {
@@ -26,10 +27,10 @@
         #timer { font-size: 100px; color: #d81b60; font-weight: bold; margin-bottom: 20px; }
         
         .start-btn {
-            padding: 18px 50px; font-size: 24px;
+            padding: 20px 60px; font-size: 26px;
             background: linear-gradient(45deg, #d81b60, #f06292);
             color: white; border: none; border-radius: 50px;
-            cursor: pointer; box-shadow: 0 6px 20px rgba(216, 27, 96, 0.3);
+            cursor: pointer; box-shadow: 0 6px 25px rgba(216, 27, 96, 0.4);
             font-weight: bold;
         }
 
@@ -40,7 +41,7 @@
             display: flex; align-items: center; justify-content: center;
         }
         .left-wing { left: 0; border-right: 3px solid #fff; transform-origin: left; }
-        .right-wing { right: 0; border-left: 2px solid #fff; transform-origin: right; }
+        .right-wing { right: 0; border-left: 3px solid #fff; transform-origin: right; }
         .wing-icon { font-size: clamp(80px, 15vw, 150px); filter: drop-shadow(0 0 15px white); }
 
         #content {
@@ -73,9 +74,6 @@
             max-width: 250px; border: 3px solid #f8bbd0;
         }
         .photo-frame img { width: 100%; border-radius: 10px; display: block; }
-        .photo-frame:nth-child(odd) { transform: rotate(-3deg); }
-        .photo-frame:nth-child(even) { transform: rotate(3deg); }
-
         .show-element { opacity: 1 !important; transform: translateY(0) !important; }
 
         .heart {
@@ -95,24 +93,18 @@
         .heart::after { top: -10px; }
         @keyframes fall { to { transform: translateY(110vh) rotate(45deg) rotateY(360deg); } }
 
-        /* تعديل مشغل الفيديو ليكون شغالاً تقنياً لكنه مخفي بصرياً */
         #player-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 1px;
-            height: 1px;
-            opacity: 0.01;
-            pointer-events: none;
-            z-index: -1;
+            position: fixed; bottom: 0; left: 0;
+            width: 1px; height: 1px; opacity: 0.01;
+            z-index: -1; pointer-events: none;
         }
     </style>
 </head>
 <body>
 
     <div id="countdown-screen">
-        <p style="font-size: 24px; color: #880e4f; margin-bottom: 30px; font-weight: bold;">جاهزة للمفاجأة يا فوفا؟ 🦋💕</p>
-        <button class="start-btn" id="mainStartBtn" onclick="initSurprise()">اضغطي هنا للبدء</button>
+        <p style="font-size: 24px; color: #880e4f; margin-bottom: 30px; font-weight: bold; text-align: center;">اضغطي هنا لتفعيل المفاجأة يا فوفا 🦋💕</p>
+        <button class="start-btn" id="mainStartBtn">ابدئي الآن</button>
         <div id="timer" style="display:none;">10</div>
     </div>
 
@@ -130,9 +122,7 @@
         </div>
     </div>
 
-    <div id="player-container">
-        <div id="player"></div>
-    </div>
+    <div id="player-container"><div id="player"></div></div>
 
     <script>
         var player;
@@ -141,30 +131,27 @@
         var firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        // لا نقوم بإنشاء المشغل هنا، بل ننتظر الضغط
-        function onYouTubeIframeAPIReady() {}
-
-        function initSurprise() {
-            // إنشاء المشغل فوراً في لحظة التفاعل مع الزر
+        function onYouTubeIframeAPIReady() {
+            // نجهز المشغل لكن لا نشغله إلا بضغط الزر
             player = new YT.Player('player', {
-                height: '10',
-                width: '10',
+                height: '1px', width: '1px',
                 videoId: 'GX9TnnqDWkY',
-                playerVars: {
-                    'autoplay': 1,
-                    'mute': 0,
-                    'controls': 0,
-                    'playsinline': 1,
-                    'enablejsapi': 1
-                },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange
+                playerVars: { 
+                    'autoplay': 0, 'mute': 0, 'controls': 0, 
+                    'playsinline': 1, 'enablejsapi': 1 
                 }
             });
+        }
 
-            // بدء العد التنازلي
-            document.getElementById('mainStartBtn').style.display = 'none';
+        // الربط بالزر بطريقة مباشرة للآيفون
+        document.getElementById('mainStartBtn').addEventListener('click', function() {
+            if (player && player.playVideo) {
+                player.playVideo();
+                player.unMute();
+                player.setVolume(100);
+            }
+            
+            this.style.display = 'none';
             document.querySelector('#countdown-screen p').style.display = 'none';
             let timerElement = document.getElementById('timer');
             timerElement.style.display = 'block';
@@ -178,38 +165,21 @@
                     openEverything();
                 }
             }, 1000);
-        }
-
-        function onPlayerReady(event) {
-            event.target.playVideo();
-            event.target.unMute();
-            event.target.setVolume(100);
-        }
-
-        function onPlayerStateChange(event) {
-            // إذا توقف الفيديو لأي سبب، نحاول تشغيله مرة أخرى
-            if (event.data === YT.PlayerState.UNSTARTED || event.data === YT.PlayerState.PAUSED) {
-                player.playVideo();
-                player.unMute();
-            }
-        }
+        });
 
         function openEverything() {
-            // محاولة أخيرة للتأكد من الصوت عند فتح الأبواب
-            if (player && typeof player.playVideo === 'function') {
+            // تأكيد تشغيل الصوت عند فتح الأبواب
+            if (player && player.playVideo) {
                 player.playVideo();
                 player.unMute();
             }
 
             document.getElementById('countdown-screen').style.opacity = '0';
             setTimeout(() => { document.getElementById('countdown-screen').style.display = 'none'; }, 800);
-
             document.getElementById('leftDoor').style.transform = 'translateX(-100%) rotateY(-90deg)';
             document.getElementById('rightDoor').style.transform = 'translateX(100%) rotateY(90deg)';
-
             setTimeout(() => { document.getElementById('messageCard').classList.add('show-element'); }, 1000);
             setTimeout(() => { document.getElementById('photoGallery').classList.add('show-element'); }, 2000);
-            
             setInterval(createHeart, 350);
         }
 
