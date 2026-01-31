@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مفاجأة لفوفا 🦋</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #fce4ec;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* شاشة العد التنازلي */
+        #countdown-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        #timer {
+            font-size: 100px;
+            color: #d81b60;
+            font-weight: bold;
+        }
+
+        .start-btn {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: #d81b60;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* أبواب الفراشة */
+        .butterfly-door {
+            position: fixed;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: #f06292;
+            z-index: 900;
+            transition: transform 2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .left-wing {
+            left: 0;
+            border-right: 2px solid #fff;
+            transform-origin: left;
+        }
+
+        .right-wing {
+            right: 0;
+            border-left: 2px solid #fff;
+            transform-origin: right;
+        }
+
+        .wing-icon {
+            font-size: 150px;
+            filter: drop-shadow(0 0 10px white);
+        }
+
+        /* محتوى المفاجأة */
+        #content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+            background: radial-gradient(circle, #fce4ec 0%, #f8bbd0 100%);
+        }
+
+        .message-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 600px;
+            line-height: 1.8;
+            font-size: 22px;
+            color: #880e4f;
+            border: 2px solid #f06292;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease 2s;
+        }
+
+        .show-message {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .butterfly-animation {
+            font-size: 50px;
+            animation: flap 1s infinite alternate;
+        }
+
+        @keyframes flap {
+            from { transform: scale(1); }
+            to { transform: scale(1.2); }
+        }
+
+        /* إخفاء فيديو اليوتيوب */
+        #player {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="countdown-screen">
+        <p style="font-size: 24px; color: #880e4f;">هل أنتي جاهزة للمفاجأة؟ 🦋</p>
+        <button class="start-btn" onclick="startSurprise()">اضغطي هنا</button>
+        <div id="timer" style="display:none;">10</div>
+    </div>
+
+    <div class="butterfly-door left-wing" id="leftDoor">
+        <span class="wing-icon">🦋</span>
+    </div>
+    <div class="butterfly-door right-wing" id="rightDoor">
+        <span class="wing-icon">🦋</span>
+    </div>
+
+    <div id="content">
+        <div class="butterfly-animation">🦋✨🌸</div>
+        <div class="message-card" id="messageCard">
+            كُل عام وانتي بخير ي فوفا عسى ربي ما يحرمني من وجودك ولا من طيبتك وحنيتك اتمنى تكون سنه حلوه ومليانه فرح وسعاده الله يسعدك ويوفقك و يرزقك بكل ماتتمني يارب و عسى ربي يسهلك دربك و اشوفك ف اعلى المناصب يارب وباذن الله تتخرجي بمرتبة الشرف الاولى لاني اثق فيكِ 🩶
+        </div>
+    </div>
+
+    <div id="player"></div>
+
+    <script>
+        // تحميل واجهة برمجة تطبيقات يوتيوب
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '0',
+                width: '0',
+                videoId: 'GX9TnnqDWkY', // ايدي الأغنية اللي طلبتيها
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // المشغل جاهز
+        }
+
+        function startSurprise() {
+            document.querySelector('.start-btn').style.display = 'none';
+            document.querySelector('#countdown-screen p').style.display = 'none';
+            let timerElement = document.getElementById('timer');
+            timerElement.style.display = 'block';
+            
+            let timeLeft = 10;
+            let countdownInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.innerText = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    openDoors();
+                }
+            }, 1000);
+        }
+
+        function openDoors() {
+            // تشغيل الموسيقى
+            player.playVideo();
+            
+            // إخفاء شاشة العد
+            document.getElementById('countdown-screen').style.display = 'none';
+            
+            // فتح الأبواب
+            document.getElementById('leftDoor').style.transform = 'translateX(-100%) rotateY(-90deg)';
+            document.getElementById('rightDoor').style.transform = 'translateX(100%) rotateY(90deg)';
+            
+            // إظهار الرسالة
+            setTimeout(() => {
+                document.getElementById('messageCard').classList.add('show-message');
+            }, 500);
+        }
+    </script>
+</body>
+</html>
